@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema(
 			type: String,
             required: true
 		},
+        role: {
+            type: String,
+            reduired: true,
+            enum: ["admin", "user"]
+        },
 		projects: {
 			type: Array,
 			default: []
