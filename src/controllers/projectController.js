@@ -1,5 +1,5 @@
-const Project = require('../models/project');
-const User = require('../models/user');
+const Project = require('../models/projectModel');
+const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const { verifyToken } = require('../middlewares/jwtmiddleware');
 
