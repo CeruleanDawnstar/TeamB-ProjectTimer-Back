@@ -20,15 +20,8 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             enum: ["admin", "user"]
-        },
-		projects: {
-			type: Array,
-			default: []
-		},
-		team: {
-			type: ObjectId,
-			ref: 'Team'
-		}
+        }
+		
 	},
 	{ timestamps: true }
 );
