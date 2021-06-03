@@ -1,5 +1,5 @@
-const Project = require('../models/project');
-const User = require('../models/user');
+const Project = require('../models/projectModel');
+const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const { verifyToken } = require('../middlewares/jwtmiddleware');
 
@@ -33,7 +33,7 @@ exports.createProject = async (_, args, {req}) => {
     }
 }
 
-const updateProject = async (_, args, { req }) => {
+exports.updatedProject = async (_, args, { req }) => {
 	const currentUser = await verifyToken(req);
 	// validation
 	if (args.input.name.trim() === '' && args.input.description.trim() === '')
@@ -56,7 +56,7 @@ const updateProject = async (_, args, { req }) => {
 	return updatedProject;
 };
 
-const deleteProject = async (_, args, { req, res }) => {
+exports.deletedProject= async (_, args, { req, res }) => {
 	const currentUser = await verifyToken(req);
 	const currentUserFromDb = await User.findOne({ email: currentUser.email }).exec();
 	const projectToDelete = await Project.findById({ _id: args.projectId }).exec();
@@ -72,3 +72,19 @@ const deleteProject = async (_, args, { req, res }) => {
 
 	return deletedProject;
 };
+
+exports.projectsByUser = async (_, args, { req }) => {
+    try {
+		const currentUser = await verifyToken(req);
+		if (currentUser) {
+			// Grab the right user 
+			const userFromDb = await User.findOne({ email: currentUser.email }).exec();
+
+			return await Project.find({ createdBy: userFromDb })
+				.populate('createdBy', '_id username name')
+				.sort({ createdAt: -1 });
+		}
+	} catch (error) {
+		console.log(error);
+	}
+}
