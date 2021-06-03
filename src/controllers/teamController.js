@@ -81,7 +81,7 @@ exports.deleteATeam = (req, res) => {
         } else {
             res.status(200);
             res.json({
-                message: "Article supprimé"
+                message: "team supprimé"
             });
         }
     });
