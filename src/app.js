@@ -24,5 +24,8 @@ server.use(bodyParser.json());
 const teamRoute = require('./routes/teamRoute');
 teamRoute(server);
 
+const userRoute = require('./routes/userRoute');
+userRoute(server);
+
 
 server.listen(port, hostname);
