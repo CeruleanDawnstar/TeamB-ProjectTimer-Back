@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const timestamps = require('mongoose-timestamps')
+//const timestamps = require('mongoose-timestamps')
 
 const teamSchema = new Schema(
 	{
@@ -18,9 +18,10 @@ const teamSchema = new Schema(
 			type: String,
 
 		}
-	}
+	},
+	{ timestamps: true }
 );
 
-teamSchema.plugin(timestamps);
+//teamSchema.plugin(timestamps);
 
 module.exports = mongoose.model('Team', teamSchema);
