@@ -19,15 +19,12 @@ const userSchema = new mongoose.Schema(
         role: {
             type: String,
             required: true,
+			default:'user',
             enum: ["admin", "user"]
         },
 		projects: {
 			type: Array,
 			default: []
-		},
-		team: {
-			type: ObjectId,
-			ref: 'Team'
 		}
 	},
 	{ timestamps: true }
