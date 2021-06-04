@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { ObjectId } = mongoose.Schema;
+const mongooseSchema = mongoose.Schema;
 
 const projectSchema = mongoose.Schema(
 	{
@@ -7,22 +7,25 @@ const projectSchema = mongoose.Schema(
 			type: String,
 			required: true
 		},
+		admin: {
+			type: mongooseSchema.Types.ObjectId,
+			ref: 'User',
+			required: true
+		},
 		description: {
 			type: String,
 			required: true
 		},
-		assignedTeams: {
-			type: Array,
-			default: []
+		groups: {
+			type: mongooseSchema.Types.ObjectId,
+			ref: 'Group',
+			required: true
 		},
-		tasks: {
-			type: Array,
-			default: []
-		},
-		createdBy: {
-			type: ObjectId,
-			ref: 'User'
+		created: {
+			type: Date,
+			default: Date.now()
 		}
+		
 	},
 );
 
