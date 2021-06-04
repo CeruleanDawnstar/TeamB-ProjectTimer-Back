@@ -1,23 +1,28 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const {ObjectId} = mongoose.Schema;
 //const timestamps = require('mongoose-timestamps')
 
-const teamSchema = new Schema(
+const teamSchema = mongoose.Schema(
 	{
 		name: {
 			type: String
 		},
-		createdBy: {
-			type: String
+	    users: {
+			type: Array,
+			default: []
 		},
 		description: {
 			type: String,
 			required: true
 		},
+		admin: {
+			type: ObjectId,
+			ref: 'User'
+		},
 		id_project: {
-			type: String,
-
+			type: String
 		}
+	
 	},
 	{ timestamps: true }
 );
