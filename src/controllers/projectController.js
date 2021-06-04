@@ -1,90 +1,110 @@
-const Project = require('../models/projectModel');
-const User = require('../models/userModel');
-const jwt = require('jsonwebtoken');
-const { verifyToken } = require('../middlewares/jwtmiddleware');
+const mongoose = require('mongoose')
+const projectUtils = require('../utils/projectUtils')
+const Project = require('../models/projectModel')
+const Model = mongoose.model("Project")
 
-exports.createProject = async (_, args, {req}) => {
-    try{
-        const currentUser = await verifyToken(req);
-        if (args.input.name.trim() === '')
-			return res.json({
-				errorMessage: 'Fill in the field to create a new project'
-			});
-            if (currentUser) {
-                const project = await Project.findOne({ name: args.input.name }).exec();
-                if (project)
-                    return res.json({
-                        errorMessage: 'This name already exists, please choose another one'
-                    });
-                // Get the user
-                const userFromDb = await User.findOne({ email: currentUser.email }).exec();
-                // create a new project
-                let newProject = new Project({
-                    ...args.input,
-                    createdBy: userFromDb._id
-                })
-                    .save()
-                    .then((project) => project.execPopulate('createdBy', '_id username name'));
-    
-                return newProject;
-            }
+exports.createProject = async (req, res) => {
+    try {
+        await projectUtils.checkData(req);
+
+        const newProject = new Project({
+            name: req.body.name,
+            groups: req.body.groups,
+            admin: req.user._id
+        });
+
+        newProject.save(async (error, project) => {
+            if (error) {
+				console.log(error)
+			}
+            await project.populate('groups', 'name').execPopulate()
+            await project.populate('admin', ['email', 'name']).execPopulate()
+            return res.status(200).json(project)
+        });
+
     } catch (error) {
-        console.log(error.message);
+        console.log(error.message)
+    }
+};
+
+exports.getAllProjects = async (req, res) => {
+    try {
+        await Model.find({})
+        .populate('groups', 'name')
+        .populate('admin', ['email', 'name'])
+        .exec((error, results) => {
+            if (error) console.log(error)
+            res.status(200).json(results);
+        })
+    } catch (error) {
+        console.log(error.message)
+    }
+};
+
+exports.getProjectById = async (req, res) => {
+    try {
+        const project = req.params.id
+        await projectUtils.checkId(project)
+
+        const find = {
+            _id: project
+        }
+
+        await Model.findById(find)
+        .populate('groups', 'name')
+        .populate('admin', ['email', 'name'])
+        .exec((error, results) => {
+            if (error) console.log(error)
+            res.status(200).json(results)
+        })
+
+    } catch (error) {
+        console.log(error.message)
+    }
+};
+
+exports.updateProject = async (req, res) => {
+    try {
+        await projectUtils.checkData(req)
+
+        const updateProject = {
+            name: req.body.name,
+            groups: req.body.groups,
+            admin: req.body.admin
+        };
+
+        const find = {
+            _id: req.params.id
+        }
+
+        Model.findOneAndUpdate(find, updateProject, {new: true}, async (error, updated) => {
+            if (error) console.log(error)
+            await updated.populate('groups', 'name').execPopulate()
+            await updated.populate('admin', ['email', 'name']).execPopulate()
+            res.status(200).json(updated)
+        })
+
+    } catch (error) {
+        console.log(error.message)
     }
 }
 
-exports.updatedProject = async (_, args, { req }) => {
-	const currentUser = await verifyToken(req);
-	// validation
-	if (args.input.name.trim() === '' && args.input.description.trim() === '')
-		return res.json({
-			errorMessage: 'Fill in the fields to update a project'
-		});
-	//  Get current user
-	const currentUserFromDb = await User.findOne({ email: currentUser.email }).exec();
-	// _id of team or group to update
-	const projectToUpdate = await Project.findById({ _id: args.input._id }).exec();
-	// Allow update if current user id and id of the team's admin are same,
-	if (currentUserFromDb._id.toString() !== projectToUpdate.createdBy._id.toString())
-		return res.json({
-			errorMessage: "You don't have rights to make changes"
-		});
-	let updatedProject = await Project.findByIdAndUpdate(args.input._id, { ...args.input }, { new: true })
-		.exec()
-		.then((project) => project.populate('createdBy', '_id username name').execPopulate());
-
-	return updatedProject;
-};
-
-exports.deletedProject= async (_, args, { req, res }) => {
-	const currentUser = await verifyToken(req);
-	const currentUserFromDb = await User.findOne({ email: currentUser.email }).exec();
-	const projectToDelete = await Project.findById({ _id: args.projectId }).exec();
-	// validation
-	if (!projectToDelete) return res.json({ errorMessage: "This project does not exist" });
-	if (currentUserFromDb._id.toString() !== projectToDelete.createdBy._id.toString())
-		return res.json({
-			errorMessage: "You do not have the right to delete this project"
-		});
-	let deletedProject = await Project.findByIdAndDelete({ _id: args.projectId })
-		.exec()
-		.then((project) => project.populate('createdBy', '_id username name').execPopulate());
-
-	return deletedProject;
-};
-
-exports.projectsByUser = async (_, args, { req }) => {
+exports.deleteProject = async (req, res) => {
     try {
-		const currentUser = await verifyToken(req);
-		if (currentUser) {
-			// Grab the right user 
-			const userFromDb = await User.findOne({ email: currentUser.email }).exec();
+        const project = req.params.id
+        const user = req.user._id
+        await projectUtils.checkIfAdmin(project, user)
 
-			return await Project.find({ createdBy: userFromDb })
-				.populate('createdBy', '_id username name')
-				.sort({ createdAt: -1 });
-		}
-	} catch (error) {
-		console.log(error);
-	}
-}
+        const find = {
+            _id: project
+        }
+
+        Model.remove(find, (error) => {
+            if (error) console.log(error)
+            res.status(200).json({message: "Project was deleted"})
+        })
+
+    } catch (error) {
+        console.log(error.message)
+    }
+};
