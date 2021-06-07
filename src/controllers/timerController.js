@@ -1,89 +1,167 @@
-const Project = require('../models/projectModel');
-const User = require('../models/userModel');
-const Timer = require('../models/timerModel');
-const { verifyToken } = require('../middlewares/jwtmiddleware');
+const mongoose = require('mongoose');
+const schema = require('../models/timerModel');
+const Model = mongoose.model("Timer");
+const projectUtils = require('../utils/projectUtils');
+const timerUtils = require('../utils/timerUtils');
 
-exports.createTimer = async (_, args, { req }) => {
+exports.setTimer = async (req, res) => {
     try {
-		const currentUser = await verifyToken(req);
+        const user = req.user._id
 
-		if (args.input.title.trim() === '')
-			return res.json({
-				errorMessage: 'Fill in the blank to create a new task'
-			});
+        const find = {
+            user: user,
+            dateEnd: null
+        }
 
-		if (currentUser) {
-			const project = await Project.findOne({ _id: args.projectId }).exec();
+        const isActive = await Model.findOne(find, (err, result) => {
+            if (err) console.log(err)
+            return result;
+        });
 
-			// update project tasks field 
-			await Project.findOneAndUpdate({ _id: args.projectId }, { tasks: { ...args.input } }, { new: true }).exec();
+        if (isActive) {
+            const find = {
+                _id: isActive._id
+            }
 
-			// create a new timer
-			let newTimer = new Timer({
-				...args.input,
-				project: project._id
-			})
-				.save()
-				.then((timer) => timer.execPopulate('project', '_id name description createdBy'));
+            const update = {
+                end: Date.now()
+            }
 
-			return newTimer;
+            Model.findOneAndUpdate(find, update, {new: true}, async (err, updated) => {
+                if (err) console.log(err)
+
+                await updated.populate('user', ['email', 'name']).execPopulate()
+                await updated.populate('project', 'name').execPopulate()
+    
+                res.status(200).json({
+                    message: "Timer was stopped",
+                    active: false,
+                    data: updated
+                })
+            })
+
+        } else {
+            const project = req.body.project
+            await projectUtils.checkId(project)
+
+            const newTimer = new schema({
+                project: project,
+                user: user,
+                dateStart: Date.now()
+            })
+
+            newTimer.save(async (err, created) => {
+                if (err) console.log(err)
+
+                await created.populate('user', ['email', 'name']).execPopulate()
+                await created.populate('project', 'name').execPopulate()
+
+                res.status(200).json({
+                    message: "Timer  has started",
+                    active: true,
+                    data: created
+                })
+            })
+        }
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+exports.getTimerByUser = async (req, res) => {
+    try {
+        const user = req.params.id
+
+        const find = {
+            user: user
+        }
+
+        Model.find(find)
+        .populate('user', ['email', 'name'])
+        .populate('project', 'name')
+        .exec((err, result) => {
+            if (err) {
+				console.log(err);
+			} else{
+				res.status(200);
+				res.json(result);
+			}
+            
+        })
+
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+exports.getTimerByProject = async (req, res) => {
+    try {
+        const project = req.params.id
+        await projectUtils.checkId(project)
+
+        const find = {
+            project: project
+        }
+
+        Model.find(find)
+        .populate('user', ['email', 'name'])
+        .populate('project', 'name')
+        .exec((err, result) => {
+            if (err) console.log(err)
+            res.status(200).json(result)
+        })
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.updateTimer = async (req, res) => {
+    try {
+        const timer = req.params.id
+        await timerUtils.checkId(timer)
+
+        const find = {
+            _id: timer
+        }
+
+		const update = {
+			end: Date.now()
 		}
-	} catch (error) {
-		console.log(error.message);
+
+        Model.findOneAndUpdate(find, update, {new: true}, async (error, updated) => {
+            if (error) console.log(error)
+
+            await updated.populate('user', ['email', 'name']).execPopulate()
+            await updated.populate('project', 'name').execPopulate()
+
+            res.status(200).json({
+                message: "Timer was stopped",
+                active: false,
+                data: updated
+            })
+        })
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+exports.deleteTimer = async (req, res) => {
+    try {
+        const timer = req.params.id
+        await timerUtils.checkId(timer)
+
+        const find= {
+            _id: req.params.id
+        }
+
+        Model.remove(find, (error) => {
+            res.status(200);
+			res.json({"message": "Timer was deleted"});
+            if (error) console.log(error)
+        })
+
+    } catch (error) {
+        console.log(error);
 	}
 };
-
-// return all timers per project for a given user
-exports.timersPerProject = async (_, args, { req }) => {
-    try {
-		const currentUser = await verifyToken(req);
-		if (currentUser) {
-			const currentProject = await Project.findById({ _id: args.projectId }).exec();
-			if (currentProject) return await Timer.find({}).sort({ createdAt: -1 }).exec();
-		}
-	} catch (error) {
-		console.log(error);
-	}
-};
-
-exports.updateTimer = async (_, args, { req }) => {
-	const currentUser = verifyToken(req); 
-
-	if (args.input.title.trim() === '' && args.input.description.trim() === '')
-		return res.json({
-			errorMessage: 'Fill in the blank to update tasks for this project'
-		});
-	//  Get current user 
-	const currentUserFromDb = await User.findOne({ email: currentUser.email }).exec();
-	// _id of team to update
-	const timerToUpdate = await Timer.findById({ _id: args.input._id }).exec();
-	// Update if current user id team's admin id are the same,
-	if (currentUserFromDb._id.toString() !== timerToUpdate.project.createdBy._id.toString())
-		return res.json({
-			errorMessage: "You do not have the rights to perform this action"
-		});
-	let updatedTimer = await Timer.findByIdAndUpdate(args.input._id, { ...args.input }, { new: true })
-		.exec()
-		.then((timer) => timer.populate('project', '_id name description createdBy').execPopulate());
-
-	return updatedTimer;
-};
-
-exports.deleteTimer = async (_, args, { req }) => {
-	const currentUser = verifyToken(req); 
-
-	const currentUserFromDb = await User.findOne({ email: currentUser.email }).exec();
-	const timerToDelete = await Timer.findById({ _id: args.timerId }).exec();
-	
-	if (!timerToDelete) return res.json({ errorMessage: "This project does not exist" });
-	if (currentUserFromDb._id.toString() !== timerToDelete.project.createdBy._id.toString())
-		return res.json({
-			errorMessage: "You do not have the rights to perform this action"
-		});
-	let deletedTimer = await Timer.findByIdAndDelete({ _id: args.timerId })
-		.exec()
-		.then((timer) => timer.populate('project', '_id name description createdBy').execPopulate());
-
-	return deletedTimer;
-};
-
