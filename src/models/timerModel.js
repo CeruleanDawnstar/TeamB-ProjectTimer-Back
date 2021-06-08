@@ -1,23 +1,23 @@
 const mongoose = require('mongoose');
-const { ObjectId } = mongoose.Schema;
+const Schema = mongoose.Schema;
 
-const timerSchema = mongoose.Schema(
+const timerSchema = new Schema(
 	{
-            loggedTime: {
-                type: Number,
-                required: true,
-                default: 0
-            },
-            title: {
-                type: String,
+            user: {
+                type: Schema.Types.ObjectId,
+                ref: 'User',
                 required: true
             },
-            description: {
-                type: String
-            },
             project: {
-                type: ObjectId,
-                ref: 'Project'
+                type: Schema.Types.ObjectId,
+                ref: 'Project',
+                required: true
+            },
+            start: {
+                type: Date
+            },
+            end: {
+                type: Date
             }
 
 	},
