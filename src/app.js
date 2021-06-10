@@ -20,4 +20,14 @@ const bodyParser = require('body-parser');
 server.use(bodyParser.urlencoded());
 server.use(bodyParser.json());
 
+
+const userRoute = require('./routes/userRoute');
+userRoute(server);
+
+const projectRoute = require('./routes/projectRoute');
+projectRoute('server');
+
+const timerRoute = require('./routes/timerRoute');
+timerRoute(server);
+
 server.listen(port, hostname);
