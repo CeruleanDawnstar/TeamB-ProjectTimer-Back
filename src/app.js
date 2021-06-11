@@ -21,6 +21,14 @@ server.use(bodyParser.urlencoded());
 server.use(bodyParser.json());
 
 
+<<<<<<< HEAD
+const teamRoute = require('./routes/teamRoute');
+teamRoute(server);
+
+const userRoute = require('./routes/userRoute');
+userRoute(server);
+
+=======
 const userRoute = require('./routes/userRoute');
 userRoute(server);
 
@@ -29,5 +37,6 @@ projectRoute('server');
 
 const timerRoute = require('./routes/timerRoute');
 timerRoute(server);
+>>>>>>> 8e49bc8d9f0411bc27600caab75ea180d698686a
 
 server.listen(port, hostname);

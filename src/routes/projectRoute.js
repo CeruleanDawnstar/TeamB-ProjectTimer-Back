@@ -1,5 +1,6 @@
 const projectController = require('../controllers/projectController');
-const jwtMiddleware = require('../middlewares/jwtMiddleware');
+const jwtMiddleware = require('../middlewares/jwtmiddleware');
+
 
 module.exports = (server) => {
     server.route('/project')

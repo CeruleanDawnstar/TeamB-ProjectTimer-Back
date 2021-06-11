@@ -19,9 +19,18 @@ const userSchema = new mongoose.Schema(
         role: {
             type: String,
             required: true,
+			default:'user',
             enum: ["admin", "user"]
+<<<<<<< HEAD
+        },
+		projects: {
+			type: Array,
+			default: []
+		}
+=======
         }
     
+>>>>>>> 8e49bc8d9f0411bc27600caab75ea180d698686a
 	},
 );
 
