@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const Model = mongoose.model("Project")
+const Project = require('../models/projectModel')
 
 /**
  * Check if user is the admin
@@ -12,12 +12,14 @@ exports.checkIfAdmin = async (project, user) => {
 
     const find = {
         _id: project,
-        admin: {
+        user: {
             _id: user
         }
     }
+    console.log(find)
     
-    const isAdmin = await  Model.exists(find)
+    const isAdmin = await  Project.exists(find)
+
     if (!isAdmin) {
         throw new Error("Only admin can perform this task");
     }
@@ -33,8 +35,10 @@ exports.checkIfAdmin = async (project, user) => {
 exports.checkId = async (id) => {
     if (id === '') {
         throw new Error("This is not a valid id");
+        
     } else {
-        const exist = await Model.exists({_id: id})
+        const exist = await Project.exists({_id: id})
+        
         if (!exist) throw new Error("This id does not exist");
     }
 
@@ -55,17 +59,21 @@ exports.checkData = async (req) => {
     }
 
     let proj
-
+    console.log(project)
+    console.log(name)
     if (project) {
-        const user = req.user._id
+        const user = req.body.user._id
+        console.log(user)
         await this.checkIfAdmin(project, user)
 
-        proj = await Model.exists({_id: {$nin: project},name: name.trim()})
+        proj = await Project.exists({_id: {$nin: project},name: name.trim()})
 
-        const admin = req.body.admin
+        const admin = req.body.user._id
         if (!admin) throw new Error('Insert an id for the admin')
     } else {
-        proj = await Model.exists({name: name})
+
+        proj = await Project.exists({name: name})
+       
     }
 
     if (proj) throw new Error('Name used by another project')
