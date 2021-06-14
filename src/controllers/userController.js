@@ -20,7 +20,7 @@ exports.userRegister = (req, res) => {
             } else {
             res.status(201);
             res.json({
-                message: `The user ${user.name} has been cretaed`
+                message: `The user ${user.username} has been cretaed`
                 });
             }
         });
@@ -47,6 +47,7 @@ exports.userLogin = (req, res) => {
                 if (user.email === req.body.email && foundMatch) {
                     jwt.sign({
                         user : {
+                            username: user.username,
                             id: user._id,
                             email: user.email,
                             role: user.role
@@ -63,7 +64,9 @@ exports.userLogin = (req, res) => {
                         } else {
                             res.status(200);
                             res.json({
-                                token
+                                token,
+                                user
+                                
                             });
                         }
                     })
