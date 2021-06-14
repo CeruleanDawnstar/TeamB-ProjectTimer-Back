@@ -10,7 +10,8 @@ exports.createProject = async (req, res) => {
         const newProject = new Project({
             name: req.body.name,
             groups: req.body.groups,
-            admin: req.user._id
+            description: req.body.description,
+            admin: req.body.admin
         });
 
         newProject.save(async (error, project) => {
