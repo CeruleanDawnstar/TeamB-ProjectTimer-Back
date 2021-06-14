@@ -14,24 +14,14 @@ const userSchema = new mongoose.Schema(
 		},
 		password: {
 			type: String,
-            required: true
+           	 	required: true
 		},
-        role: {
-            type: String,
-            required: true,
+       		 role: {
+            		type: String,
+          		required: true,
 			default:'user',
-            enum: ["admin", "user"]
-<<<<<<< HEAD
-        },
-		projects: {
-			type: Array,
-			default: []
-		}
-=======
-        }
-    
->>>>>>> 8e49bc8d9f0411bc27600caab75ea180d698686a
-	},
+          		enum: ["admin", "user"]
+
 );
 
 module.exports = mongoose.model('User', userSchema);
