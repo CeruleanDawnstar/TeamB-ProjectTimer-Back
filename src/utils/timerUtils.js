@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Model = mongoose.model("Timer");
+const Model = require('../models/timerModel');
 
 /**
  * Check if id exists
