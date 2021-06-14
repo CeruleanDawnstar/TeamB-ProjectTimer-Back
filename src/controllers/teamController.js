@@ -20,9 +20,7 @@ exports.listAllTeam = (req, res) => {
 exports.createATeam = (req, res) => {
 
     let newTeam = new Team(req.body);
-    newTeam.id_project = req.params.id_project;
-
-
+ 
     newTeam.save((error, team) => {
         if (error) {
             res.status(500);
