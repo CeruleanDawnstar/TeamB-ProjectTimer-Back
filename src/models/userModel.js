@@ -3,7 +3,7 @@ const { ObjectId } = mongoose.Schema;
 
 const userSchema = new mongoose.Schema(
 	{
-		name: {
+		username: {
 			type: String
 		},
 		email: {
@@ -17,20 +17,12 @@ const userSchema = new mongoose.Schema(
             required: true
 		},
         role: {
-            type: String,
-            required: true,
+			type: String,
+			required: true,
 			default:'user',
-            enum: ["admin", "user"]
-<<<<<<< HEAD
-        },
-		projects: {
-			type: Array,
-			default: []
-		}
-=======
-        }
+			enum: ["admin", "user"]
+        	}
     
->>>>>>> 8e49bc8d9f0411bc27600caab75ea180d698686a
 	},
 );
 
