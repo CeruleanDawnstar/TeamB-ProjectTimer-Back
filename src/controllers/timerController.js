@@ -6,13 +6,14 @@ const timerUtils = require('../utils/timerUtils');
 
 exports.setTimer = async (req, res) => {
     try {
-        const user = req.user._id
-
+        const user = req.body.user._id
+        console.log(user)
         const find = {
             user: user,
             dateEnd: null
+           
         }
-
+        
         const isActive = await Model.findOne(find, (err, result) => {
             if (err) console.log(err)
             return result;

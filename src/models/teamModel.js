@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {ObjectId} = mongoose.Schema;
+const mongooseSchema = mongoose.Schema;
 //const timestamps = require('mongoose-timestamps')
 
 const teamSchema = mongoose.Schema(
@@ -7,20 +7,14 @@ const teamSchema = mongoose.Schema(
 		name: {
 			type: String
 		},
-	    users: {
-			type: Array,
-			default: []
+		user: {
+			type: mongooseSchema.Types.ObjectId,
+			ref: 'User',
+			required: true
 		},
 		description: {
 			type: String,
 			required: true
-		},
-		admin: {
-			type: ObjectId,
-			ref: 'User'
-		},
-		id_project: {
-			type: String
 		}
 	
 	},

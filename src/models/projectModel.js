@@ -7,7 +7,7 @@ const projectSchema = mongoose.Schema(
 			type: String,
 			required: true
 		},
-		admin: {
+		user: {
 			type: mongooseSchema.Types.ObjectId,
 			ref: 'User',
 			required: true
@@ -18,8 +18,7 @@ const projectSchema = mongoose.Schema(
 		},
 		groups: {
 			type: mongooseSchema.Types.ObjectId,
-			ref: 'Group',
-			required: true
+			ref: 'Team',	
 		},
 		created: {
 			type: Date,

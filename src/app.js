@@ -9,7 +9,7 @@ const server = express();
 
 server.use(cors({
     credentials: true,
-    origin: 'http://localhost'
+    origin: 'http://localhost:4200'
 }));
 
 
@@ -21,22 +21,16 @@ server.use(bodyParser.urlencoded());
 server.use(bodyParser.json());
 
 
-<<<<<<< HEAD
-const teamRoute = require('./routes/teamRoute');
-teamRoute(server);
-
-const userRoute = require('./routes/userRoute');
-userRoute(server);
-
-=======
 const userRoute = require('./routes/userRoute');
 userRoute(server);
 
 const projectRoute = require('./routes/projectRoute');
-projectRoute('server');
+projectRoute(server);
+
+const teamRoute = require('./routes/teamRoute');
+teamRoute(server);
 
 const timerRoute = require('./routes/timerRoute');
 timerRoute(server);
->>>>>>> 8e49bc8d9f0411bc27600caab75ea180d698686a
 
 server.listen(port, hostname);

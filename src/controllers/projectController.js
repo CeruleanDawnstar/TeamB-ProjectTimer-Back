@@ -10,7 +10,8 @@ exports.createProject = async (req, res) => {
         const newProject = new Project({
             name: req.body.name,
             groups: req.body.groups,
-            admin: req.user._id
+            description: req.body.description,
+            user: req.body.user
         });
 
         newProject.save(async (error, project) => {
@@ -18,7 +19,7 @@ exports.createProject = async (req, res) => {
 				console.log(error)
 			}
             await project.populate('groups', 'name').execPopulate()
-            await project.populate('admin', ['email', 'name']).execPopulate()
+            await project.populate('user', ['email', 'username']).execPopulate()
             return res.status(200).json(project)
         });
 
@@ -31,7 +32,7 @@ exports.getAllProjects = async (req, res) => {
     try {
         await Model.find({})
         .populate('groups', 'name')
-        .populate('admin', ['email', 'name'])
+        .populate('user', ['email', 'username'])
         .exec((error, results) => {
             if (error) console.log(error)
             res.status(200).json(results);
@@ -52,7 +53,7 @@ exports.getProjectById = async (req, res) => {
 
         await Model.findById(find)
         .populate('groups', 'name')
-        .populate('admin', ['email', 'name'])
+        .populate('user', ['email', 'username'])
         .exec((error, results) => {
             if (error) console.log(error)
             res.status(200).json(results)
@@ -66,21 +67,24 @@ exports.getProjectById = async (req, res) => {
 exports.updateProject = async (req, res) => {
     try {
         await projectUtils.checkData(req)
+ 
 
         const updateProject = {
             name: req.body.name,
             groups: req.body.groups,
-            admin: req.body.admin
+            description: req.body.description,
+            user: req.body.user
         };
-
+        
         const find = {
             _id: req.params.id
         }
+        console.log(find)
 
         Model.findOneAndUpdate(find, updateProject, {new: true}, async (error, updated) => {
             if (error) console.log(error)
             await updated.populate('groups', 'name').execPopulate()
-            await updated.populate('admin', ['email', 'name']).execPopulate()
+            await updated.populate('user', ['email', 'username']).execPopulate()
             res.status(200).json(updated)
         })
 

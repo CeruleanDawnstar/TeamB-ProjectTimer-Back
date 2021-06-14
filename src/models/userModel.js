@@ -3,7 +3,7 @@ const { ObjectId } = mongoose.Schema;
 
 const userSchema = new mongoose.Schema(
 	{
-		name: {
+		username: {
 			type: String
 		},
 		email: {
@@ -14,14 +14,15 @@ const userSchema = new mongoose.Schema(
 		},
 		password: {
 			type: String,
-           	 	required: true
+      required: true
 		},
-       		 role: {
-            		type: String,
-          		required: true,
-			default:'user',
-          		enum: ["admin", "user"]
-
+    role: {
+       type: String,
+       required: true,
+			 default:'user',
+       enum: ["admin", "user"]
+    }
+  },
 );
 
 module.exports = mongoose.model('User', userSchema);

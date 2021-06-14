@@ -1,7 +1,7 @@
 const teamController = require('../controllers/teamController');
 
 module.exports = (server) => {
-    server.route('/project/:id_project/team')
+    server.route('/team')
         .get(teamController.listAllTeam)
         .post(teamController.createATeam);
 

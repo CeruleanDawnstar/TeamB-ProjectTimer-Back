@@ -13,11 +13,14 @@ const timerSchema = new Schema(
                 ref: 'Project',
                 required: true
             },
+            
             start: {
-                type: Date
+                type: Date,
+                default: Date.now 
             },
             end: {
                 type: Date
+                 
             }
 
 	},
