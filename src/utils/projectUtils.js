@@ -57,12 +57,12 @@ exports.checkData = async (req) => {
     let proj
 
     if (project) {
-        const user = req.user._id
+        const user = req.body.user._id
         await this.checkIfAdmin(project, user)
 
         proj = await Project.exists({_id: {$nin: project},name: name.trim()})
 
-        const admin = req.body.admin
+        const admin = req.body.user._id
         if (!admin) throw new Error('Insert an id for the admin')
     } else {
         proj = await Project.exists({name: name})
