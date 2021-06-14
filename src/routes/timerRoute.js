@@ -2,7 +2,7 @@ const timerController = require('../controllers/timerController');
 const jwtMiddleware = require('../middlewares/jwtmiddleware'); 
 
 module.exports = (server) => {
-    server.route('/timer/') // set a new timer
+    server.route('/timer') // set a new timer
         .post(jwtMiddleware.verifyToken, timerController.setTimer);
 
     server.route('/timer/:id')
