@@ -11,6 +11,6 @@ module.exports = (server) => {
         .put(jwtMiddleware.verifyToken, projectController.updateProject)
         .delete(jwtMiddleware.verifyToken, projectController.deleteProject)
         
-    server.route('/projects/')
+    server.route('/projects')
         .get(jwtMiddleware.verifyToken, projectController.getAllProjects)
 }
