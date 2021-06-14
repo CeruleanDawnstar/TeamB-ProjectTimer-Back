@@ -6,7 +6,7 @@ const timerUtils = require('../utils/timerUtils');
 
 exports.setTimer = async (req, res) => {
     try {
-        const user = req.user._id
+        const user = req.body.user._id
 
         const find = {
             user: user,
