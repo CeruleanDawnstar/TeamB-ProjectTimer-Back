@@ -9,7 +9,7 @@ const server = express();
 
 server.use(cors({
     credentials: true,
-    origin: 'http://localhost'
+    origin: 'http://localhost:4200'
 }));
 
 
@@ -19,5 +19,18 @@ mongoose.connect('mongodb://mongo/apinode');
 const bodyParser = require('body-parser');
 server.use(bodyParser.urlencoded());
 server.use(bodyParser.json());
+
+
+const userRoute = require('./routes/userRoute');
+userRoute(server);
+
+const projectRoute = require('./routes/projectRoute');
+projectRoute(server);
+
+const teamRoute = require('./routes/teamRoute');
+teamRoute(server);
+
+const timerRoute = require('./routes/timerRoute');
+timerRoute(server);
 
 server.listen(port, hostname);

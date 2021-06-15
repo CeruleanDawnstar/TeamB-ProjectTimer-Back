@@ -1,9 +1,11 @@
 const userController = require('../controllers/userController');
 const jwtMiddleware = require('../middlewares/jwtmiddleware');
 
+
 module.exports = (server) => {
     server.post('/user/login', userController.userLogin);
     server.post('/user/register', userController.userRegister);
+
 
     server.route('/users')
         .get(jwtMiddleware.verifyToken, userController.getAllUsers)
